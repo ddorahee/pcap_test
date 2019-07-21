@@ -28,6 +28,9 @@ void print_http(const u_char* http){
         printf("TCP DATA:");
         printf("%02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n",http[19],http[20],http[21],http[22],http[23],http[24],http[25],http[26],http[27],http[28]);
     }
+    else if(http[0] != 0x18){
+        printf("NON DATA \n");
+    }
 }
 
 void print_tcmp(const u_char* tcmp){
