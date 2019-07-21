@@ -23,15 +23,16 @@ int print_icmp(const u_char* icmp){
     u_int16_t icmp1 = icmp[0] *256 + icmp[1];
     return icmp1;
 }
-int print_tcmp(const u_char* tcmp){
-    u_int16_t tcmp1 = tcmp[0];
-    return tcmp1;
+void print_http(const u_char* http){
+    if(http[0]==0x18){
+        printf("TCP DATA:");
+        printf("%02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n",http[19],http[20],http[21],http[22],http[23],http[24],http[25],http[26],http[27],http[28]);
+    }
 }
 
-void print_http(const u_char* http){
-    if(http[0]==0x50 && http[1] == 0x18){
-        printf("TCP DATA:");
-        printf("%02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n",http[8],http[9],http[10],http[11],http[12],http[13],http[14],http[15],http[16],http[17]);
+void print_tcmp(const u_char* tcmp){
+    if(tcmp[0]==0x11){
+        printf("NO TCP \n",tcmp[0]);
     }
 }
 
@@ -48,7 +49,6 @@ int main(int argc, char* argv[]) {
     fprintf(stderr, "couldn't open device %s: %s\n", dev, errbuf);
     return -1;
   }
-
 
 while (true) {
     struct pcap_pkthdr* header;
@@ -70,18 +70,15 @@ while (true) {
     print_ip(&packet[14+12]);
     printf("D-IP: ");
     print_ip(&packet[14+16]);
-    int tcmp = print_tcmp(&packet[24]);
-    if(tcmp == 17){
-        printf("NOT TCP!!\n");
-        continue;
-    }
+    print_tcmp(&packet[23]);
     printf("S-PORT: ");
     print_port(&packet[34]);
     printf("D-PORT: ");
     print_port(&packet[36]);
-    print_http(&packet[46]);
+    print_http(&packet[47]);
     printf("%u bytes captured \n", header->caplen);
     printf("======================================================\n");
+    printf("\n");
  }
 
   pcap_close(handle);
